@@ -1,0 +1,51 @@
+<p>admin works!</p>
+
+
+
+<button (click)="createDatabase()">Create database</button>
+<button (click)="createDatabase()">Create asset</button>
+
+<!-- (change)="onFileSelected($event)"  -->
+<input type="file" class="file-input"  (change)="onFileSelected($event)" #fileUpload>
+
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+   <label for="name">Name: </label>
+   <input id="name" type="text" formControlName="name">
+   <button type="submit">Send</button>
+</form>
+
+<div style="display: grid; grid-template-columns: 80px 290px 120px; border: 1px solid black;">
+@for (asset of assets; track $index) {
+ <div style="border: 1px solid black;">{{asset.name}}</div>
+ <div style="border: 1px solid black;">{{asset.filename}}</div>
+ <div style="border: 1px solid black;">
+    <a href="#" (click)="delete_blender_asset($event, asset.id)">Delete</a> - 
+    <a href="#" (click)="get_blender_asset_details($event, asset)">Details</a></div>
+ <div style="grid-column-start: 1; grid-column-end: span 3;">
+    @if (asset.details) {
+      {{asset.details}}
+    }
+ </div>
+}
+</div>
+<!--div style="display: grid; border: 1px solid red;">
+    <div style="height: 120px;">Header</div>
+   
+    <div style="height: 200px">
+     Content
+     <img [src]="imageToShow"
+        alt="Place image title"
+        *ngIf="!isImageLoading; else noImageFound">
+     <ng-template #noImageFound>
+        <img src="fallbackImage.png" alt="Fallbackimage">
+     </ng-template>
+   
+   
+     <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload>
+   
+     <button (click)="fileUpload.click()">Send</button>
+   
+    </div>
+    <div style="height: 120px;">Footer</div>
+   </div-->

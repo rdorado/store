@@ -1,0 +1,37 @@
+services:
+  blender-server:
+    build: ./src/blender
+    volumes:
+      - ./src/blender/src:/app
+      - ./data:/data
+    ports:
+      - 8000:8000
+    restart: unless-stopped
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: store
+
+  frontend:
+    build: ./src/frontend
+    working_dir: /app
+    command: sh -c "npm install && npm start -- --host 0.0.0.0 --poll"
+    volumes:
+      - ./src/frontend/store:/app
+    ports: 
+      - 4200:4200
+      - 49153:49153
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports: 
+      - 3306:3306
+    environment: 
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: store
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: user1
+volumes:
+  mysql-data:

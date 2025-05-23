@@ -9,7 +9,7 @@ paintside2.py
 pwd (current directory of this file)
 docker compose up
 
---Install banckend deps and reqs:
+--Install backend deps and reqs:
  -Go to source dir:
    src\backend\src
 

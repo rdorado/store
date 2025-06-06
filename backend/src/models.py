@@ -1,10 +1,15 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
-from sqlalchemy.orm import DeclarativeBase, sessionmaker, mapped_column, Mapped
+from typing import Optional
+from pydantic import BaseModel, ConfigDict
+from database import CategoryDAO
 
-class Base(DeclarativeBase):
-    pass
+class Category(BaseModel):
+    __daoclass__ = CategoryDAO
+    model_config = ConfigDict(from_attributes=True)
+    id: Optional[int] = None
+    name: str
 
-class BlenderAsset(Base):
+'''
+class Asset(Base):
     __tablename__ = "asset"
 
     #id = Column(Integer, primary_key = True)
@@ -30,3 +35,4 @@ class BlenderAssetMesh(Base):
     
     def __str__(self):
         return str(self.id)+" "+self.name+" "+self.filename
+'''

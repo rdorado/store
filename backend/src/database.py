@@ -1,24 +1,91 @@
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, select
-from sqlalchemy import MetaData
-from models import BlenderAsset
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
+from sqlalchemy import create_engine, String
 
-connection_string = "sqlite:///../../data/db1.db"
-#connection_string = "mysql+mysqlconnector://root:secret@mysql:3306/store"
+from settings import connection_string, create_data_folder
+
+class Base(DeclarativeBase):
+    pass
+
+class CategoryDAO(Base):
+    __tablename__ = "category"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(255))
+
+
+
 engine = create_engine(connection_string, echo = True)
 
+'''
+**********************************
+       Database management
+**********************************
+'''
+
 def create_tables():
-    metadata = MetaData()
-    metadata.create_all(engine)
+    create_data_folder()
+    Base.metadata.create_all(engine)
 
 def drop_tables():
-    metadata = MetaData()
-    metadata.drop_all(engine)
+    Base.metadata.drop_all(engine)
+
+'''
+**********************************
+       Generic Models
+**********************************
+'''
+
+def insert_model(model):
+    data = model.__daoclass__(**model.dict())
+    Session = sessionmaker(bind=engine)
+    with Session() as session:
+        session.add(data)
+        session.commit()
+        session.refresh(data)
+    return data
+
+def update_model(model):
+    Session = sessionmaker(bind=engine)
+    catDAO = None
+    with Session() as session:
+        query = session.query(model.__daoclass__)
+        data = query.get(model.id)
+        data.name = model.name
+        session.commit()
+    return catDAO
+
+def delete_model(modelclass, model_id):
+    Session = sessionmaker(bind=engine)
+    with Session() as session:
+        query = session.query(modelclass.__daoclass__)
+        data = query.get(model_id)
+        session.delete(data)
+        session.commit()
+
+def get_model(modelclass, model_id=None):
+    Session = sessionmaker(bind=engine)
+    result = None
+    with Session() as session:
+        query = session.query(CategoryDAO)
+        if model_id:
+            result = query.get(model_id)
+        else:
+            result = []
+            for category in query.all():
+                result.append(modelclass.model_validate(category))
+    return result
+
+'''
+**********************************
+       Asset
+**********************************
+'''
 
 def insert_blender_asset(name, filename):
     Session = sessionmaker(bind=engine)
     with Session() as session:
-        obj = BlenderAsset(name=name, filename=filename)
+        obj = Asset(name=name, filename=filename)
         session.add(obj)
         session.commit()
         session.refresh(obj)
@@ -27,12 +94,12 @@ def insert_blender_asset(name, filename):
 def delete_blender_asset(asset_id: int):
     Session = sessionmaker(bind=engine)
     with Session() as session:
-        obj = session.query(BlenderAsset).get(asset_id)
+        obj = session.query(Asset).get(asset_id)
         session.delete(obj)
         session.commit()
 
 def update_blender_asset(asset_id, name, filename):
-    obj = BlenderAsset.query.get(asset_id)
+    obj = Asset.query.get(asset_id)
     if not obj: return
     Session = sessionmaker(bind=engine)
     with Session() as session:
@@ -40,19 +107,21 @@ def update_blender_asset(asset_id, name, filename):
         obj.filename = filename
         session.commit()
 
+"""
 def get_blender_asset(asset_id=None):
     Session = sessionmaker(bind=engine)
     with Session() as session:
-        query = session.query(BlenderAsset)
+        query = session.query(Asset)
         if asset_id:
             result = query.get(asset_id)
         else:
             result = query.all()
     return result
+"""
     
 def insert_blender_asset_meshes(asset_id, meshes):
     Session = sessionmaker(bind=engine)
     with Session() as session:
-        asset = session.query(BlenderAsset).get(asset_id)
+        asset = session.query(Asset).get(asset_id)
         #for mesh in meshes:
         #    asset.add

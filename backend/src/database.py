@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
-from sqlalchemy import create_engine, String
+from sqlalchemy import create_engine, String, Integer
 
 from settings import connection_string, create_data_folder
 
@@ -12,6 +12,7 @@ class CategoryDAO(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255))
+    type: Mapped[int] = mapped_column(Integer)
 
 
 
@@ -51,7 +52,9 @@ def update_model(model):
     with Session() as session:
         query = session.query(model.__daoclass__)
         data = query.get(model.id)
-        data.name = model.name
+        for field in data.__table__.columns.keys():
+            if field not in data.__table__.primary_key.columns.keys():
+                setattr(data, field, getattr(model, field))
         session.commit()
     return catDAO
 

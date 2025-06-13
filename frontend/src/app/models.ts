@@ -8,4 +8,5 @@ export interface BlenderAsset {
 export interface Category {
   id: number;
   name: string;
+  type: number;
 }

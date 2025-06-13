@@ -10,12 +10,17 @@
 
       <cdk-table class="data-table-container" [dataSource]="dataSource">
          <ng-container cdkColumnDef="name">
-            <cdk-header-cell class="header-cell header-cell-name" *cdkHeaderCellDef> Name </cdk-header-cell> <!--  class="test-header" -->
+            <cdk-header-cell class="header-cell header-cell-name" *cdkHeaderCellDef> Name </cdk-header-cell>
             <cdk-cell class="data-cell data-cell-name"  *cdkCellDef="let element"> {{element.name}} </cdk-cell>
          </ng-container>
 
+         <ng-container cdkColumnDef="type">
+            <cdk-header-cell class="header-cell header-cell-type" *cdkHeaderCellDef> Type </cdk-header-cell>
+            <cdk-cell class="data-cell data-cell-type"  *cdkCellDef="let element"> {{element.type}} </cdk-cell>
+         </ng-container>
+
          <ng-container cdkColumnDef="options">
-            <cdk-header-cell class="header-cell header-cell-options" *cdkHeaderCellDef>Options</cdk-header-cell> <!--  class="test-header" -->
+            <cdk-header-cell class="header-cell header-cell-options" *cdkHeaderCellDef>Options</cdk-header-cell>
             <cdk-cell class="data-cell data-cell-options"  *cdkCellDef="let element">
                <button class="button" (click)="clickEditCategory(element)">Edit</button>
                <button class="button" (click)="clickDeleteCategory(element)">Delete</button>
@@ -38,10 +43,17 @@
          <form [formGroup]="form" (ngSubmit)="onSubmit()">
             <input type="hidden" name="type" value="{{formType}}">
             <input type="hidden" formControlName="id">
+
             <div class="form-row">
-               <label for="name">Name: </label>
+               <label class="data-label" for="name">Name: </label>
                <input id="name" type="text" formControlName="name">
             </div>
+
+            <div class="form-row">
+               <label class="data-label" for="type">Type: </label>
+               <input id="type" type="text" formControlName="type">
+            </div>
+
             <div class="buttons-container">
                <button class="button" type="button" (click)="clickCancelForm()">Cancel</button>
                <button class="button" type="submit">Send</button>

@@ -24,15 +24,16 @@ docker compose up
 
 
 --Run backend as local dev (no blender)
- -Go to source dir:
-   backend/src
-   
+
  -Activate python virtual environment:
    win:
      .venv\Scripts\activate
    linux:
      . .venv/bin/activate
      source .venv/bin/activate
+
+ -Go to source dir:
+   backend/src
 
  -Run the server:
    uvicorn main:app --host 0.0.0.0 --port 8000 --reload

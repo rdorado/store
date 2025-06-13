@@ -26,13 +26,14 @@ export class CategoryComponent implements OnInit {
   displayForm: string = "none";
   formType: string = ""
   form: FormGroup;
-  displayedColumns: string[] = ['name', 'options'];
+  displayedColumns: string[] = ['name', 'type', 'options'];
   dataSource: DataSource<Category> = new CategoryDataSource([]);
 
   constructor(private backendService: BackendService, private fb: FormBuilder){
     this.form = this.fb.group({
       id: [],
       name: ['', Validators.required],
+      type: ['', Validators.required],
     });
   }
 
@@ -43,17 +44,23 @@ export class CategoryComponent implements OnInit {
   onSubmit(){
     if (this.form.valid) {
       if (this.formType === "insert") {
-        this.backendService.createCategoty(this.form.value).subscribe(_=> {
-          this.clickCancelForm();
-          this.form.reset();
-          this.fetchData();
+        this.backendService.createCategoty(this.form.value).subscribe({
+          next: _ => {
+            this.clickCancelForm();
+            this.form.reset();
+            this.fetchData();
+          },
+          error: e => console.log(e)
         });
       }
       else if (this.formType === "update") {
-        this.backendService.updateCategoty(this.form.value).subscribe(_=> {
-          this.clickCancelForm();
-          this.form.reset();
-          this.fetchData();
+        this.backendService.updateCategoty(this.form.value).subscribe({
+          next: _ => {
+            this.clickCancelForm();
+            this.form.reset();
+            this.fetchData();
+          },
+          error: e => console.log(e)
         });
       }
     }
@@ -86,6 +93,7 @@ export class CategoryComponent implements OnInit {
     this.displayTable = "flex";
     this.displayForm = "none";
     this.formType = "";
+    this.form.reset();
   }
 }
 

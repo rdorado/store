@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { BackendService } from '../../services/backend.service';
 import { BlenderAsset } from '../models';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    RouterModule,
   ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss'

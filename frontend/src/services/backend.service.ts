@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BlenderAsset } from '../app/models';
+import { BlenderAsset, Category } from '../app/models';
 
 @Injectable({
   providedIn: 'root'
@@ -44,5 +44,21 @@ export class BackendService {
 
   createAsset(value: BlenderAsset) {
     return this.httpClient.post(`${this.API_URL}/blender_asset`, value);
+  }
+
+  createCategoty(value: Category) {
+    return this.httpClient.post(`${this.API_URL}/category`, value);
+  }
+
+  updateCategoty(value: Category) {
+    return this.httpClient.put(`${this.API_URL}/category`, value);
+  }
+
+  deleteCategory(value: Category) {
+    return this.httpClient.delete(`${this.API_URL}/category/${value.id}`);
+  }
+
+  getCategories() {
+    return this.httpClient.get<Category[]>(`${this.API_URL}/category`);
   }
 }

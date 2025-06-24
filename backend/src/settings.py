@@ -2,6 +2,12 @@
 import os
 
 '''
+Data folder
+'''
+data_folder = "../../data"
+blender_folder = f"{data_folder}/blender"
+
+'''
 Connection string to the database. 
 
 SQLite:
@@ -9,16 +15,17 @@ SQLite:
 Mysql:
   connection_string = "mysql+mysqlconnector://root:secret@mysql:3306/store"
 '''
-connection_string = "sqlite:///../../data/db1.db"
+connection_string = f"sqlite:///{data_folder}/db1.db"
 
-'''
-Data folder
-'''
-data_folder = "../../data"
 
+def get_data_folder():
+    return data_folder
+
+def get_blender_folder():
+    return blender_folder
 
 def create_data_folder():
-    print(data_folder)
-    print(os.path.exists(data_folder))
     if not os.path.exists(data_folder):
         os.makedirs(data_folder)
+    if not os.path.exists(blender_folder):
+        os.makedirs(blender_folder)

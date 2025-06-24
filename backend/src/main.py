@@ -1,16 +1,19 @@
+import os
 from random import randint
 
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
-from models import Category
+from models import Category, Asset
 import database
+
+from settings import get_blender_folder, create_data_folder
 
 allowed_cors_origins = [
    "http://localhost:4200",
    "http://localhost:4201",
+   "http://localhost:8000",
 ]
 
 app = FastAPI()
@@ -25,7 +28,6 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    #message = blender_utils.render()
     message = "It works"
     return {"message": message}
 
@@ -69,6 +71,63 @@ async def delete_category(model_id: int):
     database.delete_model(Category, model_id)
     return {"result": "Success"}
 
+'''
+**********************************
+       Asset
+**********************************
+'''
+
+@app.get("/asset")
+async def get_asset():
+    return database.get_model(Asset, None)
+
+@app.delete("/asset/{asset_id}")
+async def delete_asset(asset_id: int):
+    return database.delete_model(Asset, asset_id)
+
+@app.post("/asset")
+async def create_asset(data: Asset):
+    return database.insert_model(data)
+
+@app.put("/asset")
+async def update_asset(data: Asset):
+    database.update_model(data)
+    return {"result": "Success"}
+
+@app.post("/blender_asset/{asset_id}")
+async def create_file(asset_id: int, blender_file: UploadFile = File(...)):
+    filename = str(blender_file.filename)
+    if filename.endswith(".blend"):
+        rdn = randint(1000, 9999)
+        new_file_name = filename[:-6]+"_"+str(rdn)+".blend"
+        data_folder = get_blender_folder()
+        file_location = os.path.join(data_folder, new_file_name)
+        create_data_folder()
+        with open(file_location, "wb+") as file_object:
+            asset = database.get_model(Asset, asset_id)
+            asset.filename = new_file_name
+            database.update_model(asset)
+            file_object.write(blender_file.file.read())
+    return {"result": "success"}
+
+'''
+**********************************
+       TODO: refactor / delete
+**********************************
+'''
+
+#@app.get("/img")
+#async def image():
+#    filename = blender_utils.render()
+#    return FileResponse(filename)
+
+@app.delete("/blender_asset/{asset_id}")
+async def delete_blender_asset(asset_id: int):
+    asset = database.get_blender_asset(asset_id)
+    if asset:
+        os.remove(asset.filename)
+        database.delete_blender_asset(asset_id)
+
 @app.get("/thumbnail")
 async def thumbnail():
     return FileResponse("/data/thumbnail.png")
@@ -79,49 +138,6 @@ async def info():
     result = blender_utils.file_info(file_location)
     return {"result": result}
 
-'''
-**********************************
-       Blender asset
-**********************************
-'''
-
-#@app.get("/img")
-#async def image():
-#    filename = blender_utils.render()
-#    return FileResponse(filename)
-
-@app.post("/blender_asset")
-async def create_file(blender_file: UploadFile = File(...)):
-    filename = str(blender_file.filename)
-    if filename.endswith(".blend"):
-        rdn = randint(1000, 9999)
-        file_location = filename[:-6]+"_"+str(rdn)+".blend"
-        with open(file_location, "wb+") as file_object:
-            file_object.write(blender_file.file.read())
-            blender_asset = database.insert_blender_asset(name=filename, filename=file_location)
-        meshes = blender_utils.get_meshes_from_asset(file_location)
-        database.insert_blender_asset_meshes(blender_asset, meshes)
-    return {"result": "success"}
-
-'''
-@app.post("/blender_asset")
-async def create_file(data):
-    print(data)
-'''
-
-@app.delete("/blender_asset/{asset_id}")
-async def delete_blender_asset(asset_id: int):
-    asset = database.get_blender_asset(asset_id)
-    if asset:
-        os.remove(asset.filename)
-        database.delete_blender_asset(asset_id)
-
-@app.get("/blender_asset/get") 
-async def get_blender_asset():
-    return database.get_blender_asset(None)
-
 @app.get("/blender_asset/{asset_id}/meshes")
 async def get_blender_asset_meshes(asset_id: int):
     pass
-
-

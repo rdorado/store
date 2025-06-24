@@ -14,7 +14,12 @@ class CategoryDAO(Base):
     name: Mapped[str] = mapped_column(String(255))
     type: Mapped[int] = mapped_column(Integer)
 
+class AssetDAO(Base):
+    __tablename__ = "asset"
 
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(255))
+    filename: Mapped[str] = mapped_column(String(255))
 
 engine = create_engine(connection_string, echo = True)
 
@@ -70,13 +75,13 @@ def get_model(modelclass, model_id=None):
     Session = sessionmaker(bind=engine)
     result = None
     with Session() as session:
-        query = session.query(CategoryDAO)
+        query = session.query(modelclass.__daoclass__)
         if model_id:
-            result = query.get(model_id)
+            result = modelclass.model_validate(query.get(model_id))
         else:
             result = []
-            for category in query.all():
-                result.append(modelclass.model_validate(category))
+            for model in query.all():
+                result.append(modelclass.model_validate(model))
     return result
 
 '''

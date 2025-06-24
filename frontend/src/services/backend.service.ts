@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BlenderAsset, Category } from '../app/models';
+import { Asset, Category } from '../app/models';
 
 @Injectable({
   providedIn: 'root'
@@ -17,10 +17,6 @@ export class BackendService {
       .subscribe({next: result => console.log(result)});
   }
 
-  getAssetList(): Observable<BlenderAsset[]> {
-    return this.httpClient.get<BlenderAsset[]>(this.API_URL+"/blender_asset/get");
-  }
-
   getImage(): Observable<Blob> {
     return this.httpClient.get(this.API_URL+"/img", { responseType: 'blob' });
   }
@@ -33,8 +29,8 @@ export class BackendService {
       });
   }
 
-  submitFile(formData: FormData): Observable<any>{
-    return this.httpClient.post(this.API_URL+"/blender_asset", formData);
+  submitFile(asset_id: number, formData: FormData): Observable<any>{
+    return this.httpClient.post(`${this.API_URL}/blender_asset/${asset_id}`, formData);
   }
 
   deleteBlenderAsset(asset_id: number): Observable<any>{
@@ -42,15 +38,14 @@ export class BackendService {
     return this.httpClient.delete(`${this.API_URL}/blender_asset/${asset_id}`);
   }
 
-  createAsset(value: BlenderAsset) {
-    return this.httpClient.post(`${this.API_URL}/blender_asset`, value);
-  }
-
-  createCategoty(value: Category) {
+  /**
+   *  Category
+   */
+  createCategory(value: Category) {
     return this.httpClient.post(`${this.API_URL}/category`, value);
   }
 
-  updateCategoty(value: Category) {
+  updateCategory(value: Category) {
     return this.httpClient.put(`${this.API_URL}/category`, value);
   }
 
@@ -60,5 +55,24 @@ export class BackendService {
 
   getCategories() {
     return this.httpClient.get<Category[]>(`${this.API_URL}/category`);
+  }
+
+  /**
+   *  Asset
+   */
+  createAsset(value: Asset): Observable<Asset> {
+    return this.httpClient.post<Asset>(`${this.API_URL}/asset`, value);
+  }
+
+  updateAsset(value: Asset) {
+    return this.httpClient.put(`${this.API_URL}/asset`, value);
+  }
+
+  deleteAsset(value: Asset) {
+    return this.httpClient.delete(`${this.API_URL}/asset/${value.id}`);
+  }
+
+  getAsset() {
+    return this.httpClient.get<Asset[]>(`${this.API_URL}/asset`);
   }
 }

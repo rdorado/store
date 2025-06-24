@@ -1,6 +1,8 @@
 <p>admin works!</p>
 
 <a [routerLink]="['/admin/categories']">Categories</a>
+<br>
+<a [routerLink]="['/admin/asset']">Asset</a>
 <br><br>
 
 <button (click)="createDatabase()">Create database</button>
@@ -9,7 +11,6 @@
 <!-- (change)="onFileSelected($event)"  -->
 <input type="file" class="file-input"  (change)="onFileSelected($event)" #fileUpload>
 
-
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
    <label for="name">Name: </label>
    <input id="name" type="text" formControlName="name">
@@ -17,17 +18,18 @@
 </form>
 
 <div style="display: grid; grid-template-columns: 80px 290px 120px; border: 1px solid black;">
-@for (asset of assets; track $index) {
- <div style="border: 1px solid black;">{{asset.name}}</div>
- <div style="border: 1px solid black;">{{asset.filename}}</div>
- <div style="border: 1px solid black;">
-    <a href="#" (click)="delete_blender_asset($event, asset.id)">Delete</a> - 
-    <a href="#" (click)="get_blender_asset_details($event, asset)">Details</a></div>
- <div style="grid-column-start: 1; grid-column-end: span 3;">
+   @for (asset of assets; track $index) {
+   <div style="border: 1px solid black;">{{asset.name}}</div>
+   <div style="border: 1px solid black;">{{asset.filename}}</div>
+   <div style="border: 1px solid black;">
+      <a href="#" (click)="delete_blender_asset($event, asset.id)">Delete</a> -
+      <a href="#" (click)="get_blender_asset_details($event, asset)">Details</a>
+   </div>
+   <div style="grid-column-start: 1; grid-column-end: span 3;">
     @if (asset.details) {
       {{asset.details}}
     }
- </div>
+   </div>
 }
 </div>
 <!--div style="display: grid; border: 1px solid red;">

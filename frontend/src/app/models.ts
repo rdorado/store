@@ -10,3 +10,9 @@ export interface Category {
   name: string;
   type: number;
 }
+
+export interface Asset {
+  id: number;
+  name: string;
+  file: string;
+}

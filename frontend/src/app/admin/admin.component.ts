@@ -25,14 +25,14 @@ export class AdminComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    this.updateAssetsList();
+    //this.updateAssetsList();
   }
 
-  updateAssetsList() {
+  /*updateAssetsList() {
     this.backendService.getAssetList().subscribe({
       next: result => {console.log(result); this.assets = result;}
     });
-  }
+  }*/
 
   createDatabase() {
     this.backendService.createDatabase();
@@ -42,7 +42,7 @@ export class AdminComponent implements OnInit{
     event.preventDefault();
     this.backendService.deleteBlenderAsset(asset_id)
       .subscribe(_ => {
-        this.updateAssetsList();
+        //this.updateAssetsList();
       });
   }
 
@@ -52,15 +52,15 @@ export class AdminComponent implements OnInit{
   }
 
   onFileSelected(event: any) {
-    const file: File = event.target.files[0]
+    /*const file: File = event.target.files[0]
     if (file) {
       const formData = new FormData();
       formData.append("blender_file", file);
       this.backendService.submitFile(formData)
         .subscribe(_ => {
-          this.updateAssetsList();
+          //this.updateAssetsList();
         });
-    }
+    }*/
   }
 
   onSubmit(){

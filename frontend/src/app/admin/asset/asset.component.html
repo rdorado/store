@@ -1,0 +1,72 @@
+<div class="page-container">
+   <div class="nav-bar">
+     <a [routerLink]="['/admin']">Back</a>
+   </div>
+   <div class="table-container" [ngStyle]="{'display': displayTable}">
+      <h3 class="title">Assets</h3>
+      <div class="add-button-container">
+         <button class="button" (click)="clickNew()">Create new asset</button>
+      </div>
+
+      <cdk-table class="data-table-container" [dataSource]="dataSource">
+         <ng-container cdkColumnDef="name">
+            <cdk-header-cell class="header-cell header-cell-name" *cdkHeaderCellDef> Name </cdk-header-cell>
+            <cdk-cell class="data-cell data-cell-name" *cdkCellDef="let element"> {{element.name}} </cdk-cell>
+         </ng-container>
+
+         <ng-container cdkColumnDef="filename">
+            <cdk-header-cell class="header-cell header-cell-filename" *cdkHeaderCellDef> Filename </cdk-header-cell>
+            <cdk-cell class="data-cell data-cell-filename" *cdkCellDef="let element"> {{element.filename}} </cdk-cell>
+         </ng-container>
+
+         <ng-container cdkColumnDef="options">
+            <cdk-header-cell class="header-cell header-cell-options" *cdkHeaderCellDef>Options</cdk-header-cell>
+            <cdk-cell class="data-cell data-cell-options" *cdkCellDef="let element">
+               <button class="button" (click)="clickEdit(element)">Edit</button>
+               <button class="button" (click)="clickDelete(element)">Delete</button>
+            </cdk-cell>
+         </ng-container>
+
+         <cdk-header-row class="header-row" *cdkHeaderRowDef="displayedColumns"></cdk-header-row>
+         <cdk-row class="data-row" *cdkRowDef="let row; columns: displayedColumns;"></cdk-row>
+      </cdk-table>
+   </div>
+
+   <div class="form-table-container" [ngStyle]="{'display': displayForm}">
+      <div class="form-container">
+      @if (formType === "update") {
+         <h3 class="title">Edit asset</h3>
+      }
+      @if (formType === "insert") {
+         <h3 class="title">Insert new asset</h3>
+      }
+         <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <input type="hidden" name="type" value="{{formType}}">
+            <input type="hidden" formControlName="id">
+
+            <div class="form-row">
+               <label class="data-label" for="name">Name: </label>
+               <input id="name" type="text" formControlName="name">
+            </div>
+
+            <div class="form-row">
+               <label class="data-label" for="file">Filename: </label>
+               <!--input id="type" type="text" formControlName="filename"-->
+               <input id="file"
+                      type="file"
+                      class="file-input"
+                      (change)="onFileSelected($event)"
+                      formControlName="filename"
+                      #fileUpload>
+                
+               <!--button (click)="fileUpload.click()">Send</button-->
+            </div>
+
+            <div class="buttons-container">
+               <button class="button" type="button" (click)="clickCancelForm()">Cancel</button>
+               <button class="button" type="submit">Send</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>

@@ -44,7 +44,7 @@ export class CategoryComponent implements OnInit {
   onSubmit(){
     if (this.form.valid) {
       if (this.formType === "insert") {
-        this.backendService.createCategoty(this.form.value).subscribe({
+        this.backendService.createCategory(this.form.value).subscribe({
           next: _ => {
             this.clickCancelForm();
             this.form.reset();
@@ -54,7 +54,7 @@ export class CategoryComponent implements OnInit {
         });
       }
       else if (this.formType === "update") {
-        this.backendService.updateCategoty(this.form.value).subscribe({
+        this.backendService.updateCategory(this.form.value).subscribe({
           next: _ => {
             this.clickCancelForm();
             this.form.reset();

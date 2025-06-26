@@ -110,6 +110,18 @@ async def create_file(asset_id: int, blender_file: UploadFile = File(...)):
             file_object.write(blender_file.file.read())
     return {"result": "success"}
 
+@app.get("/asset_categories/{asset_id}")
+async def get_asset_categories(asset_id: int):
+    return database.get_asset_categories(Category, asset_id)
+
+@app.put("/asset_categories/{category_id}")
+async def add_category_asset(data: Asset, category_id: int):
+    database.add_category_to_asset(data.id, category_id)
+
+@app.delete("/asset_categories/{category_id}")
+async def remove_category_from_asset(data: Asset, category_id: int):
+    database.remove_category_from_asset(data.id, category_id)
+
 '''
 **********************************
        TODO: refactor / delete

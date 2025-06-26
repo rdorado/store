@@ -1,6 +1,7 @@
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
-from sqlalchemy import create_engine, String, Integer
+from typing import List, Set
+
+from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import String,Integer, ForeignKey, create_engine
 
 from settings import connection_string, create_data_folder
 
@@ -14,12 +15,24 @@ class CategoryDAO(Base):
     name: Mapped[str] = mapped_column(String(255))
     type: Mapped[int] = mapped_column(Integer)
 
+    assets: Mapped[List["AssetCategoryDAO"]] = relationship(back_populates="category")
+
 class AssetDAO(Base):
     __tablename__ = "asset"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255))
     filename: Mapped[str] = mapped_column(String(255))
+
+    categories: Mapped[List["AssetCategoryDAO"]] = relationship(back_populates="asset")
+
+class AssetCategoryDAO(Base):
+    __tablename__ = "asset_category"
+    asset_id: Mapped[int] = mapped_column(ForeignKey("asset.id"), primary_key=True)
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), primary_key=True)
+
+    asset: Mapped["AssetDAO"] = relationship(back_populates="categories")
+    category: Mapped["CategoryDAO"] = relationship(back_populates="assets")
 
 engine = create_engine(connection_string, echo = True)
 
@@ -89,6 +102,37 @@ def get_model(modelclass, model_id=None):
        Asset
 **********************************
 '''
+
+def get_asset_categories(modelclass, asset_id):
+    Session = sessionmaker(bind=engine)
+    result = []
+    with Session() as session:
+        query = session.query(modelclass.__daoclass__) \
+                       .join(CategoryDAO.assets) \
+                       .filter(AssetCategoryDAO.asset_id == asset_id)
+        for category in query.all():
+            result.append(modelclass.model_validate(category))
+    return result
+
+def add_category_to_asset(asset_id, category_id):
+    Session = sessionmaker(bind=engine)
+    assetCategory = None
+    with Session() as session:
+        assetCategory = AssetCategoryDAO()
+        assetCategory.asset = session.get(AssetDAO, asset_id)
+        assetCategory.category = session.get(CategoryDAO, category_id)
+        session.add(assetCategory)
+        session.commit()
+    return assetCategory
+
+def remove_category_from_asset(asset_id, category_id):
+    Session = sessionmaker(bind=engine)
+    assetCategory = None
+    with Session() as session:
+        assetCategory = session.get(AssetCategoryDAO, (asset_id, category_id))
+        session.delete(assetCategory)
+        session.commit()
+    return assetCategory
 
 def insert_blender_asset(name, filename):
     Session = sessionmaker(bind=engine)

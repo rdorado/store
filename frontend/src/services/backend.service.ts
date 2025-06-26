@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Asset, Category } from '../app/models';
@@ -74,5 +74,23 @@ export class BackendService {
 
   getAsset() {
     return this.httpClient.get<Asset[]>(`${this.API_URL}/asset`);
+  }
+
+  getAssetCategories(asset: Asset) {
+    return this.httpClient.get<Category[]>(`${this.API_URL}/asset_categories/${asset.id}`);
+  }
+
+  addCategoryToAsset(asset: Asset, categoryId: number) {
+    return this.httpClient.put<Category[]>(`${this.API_URL}/asset_categories/${categoryId}`, asset);
+  }
+
+  removeCategoryFromAsset(asset: Asset, categoryId: number) {
+    const options = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      body: JSON.stringify(asset),
+    };
+    return this.httpClient.delete<Category[]>(`${this.API_URL}/asset_categories/${categoryId}`, options);
   }
 }

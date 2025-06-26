@@ -1,19 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { CdkTableModule } from '@angular/cdk/table';
 import { DataSource } from '@angular/cdk/collections';
-import { BackendService } from '../../../services/backend.service';
-import { Asset } from '../../models';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+import { BackendService } from '../../../services/backend.service';
+import { Asset, Category } from '../../models';
 
 @Component({
   selector: 'app-category',
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    FormsModule,
     CdkTableModule,
     CommonModule,
     RouterModule,
@@ -30,6 +37,12 @@ export class AssetComponent implements OnInit {
   dataSource: DataSource<Asset> = new AssetDataSource([]);
   file: File|null = null;
 
+  /* Asset categories */
+  categories: Category[] = [];
+  availableCategories: Category[] = [];
+  assetCategories: Category[] = [];
+  assetCategoryId: number|undefined;
+  selectedAsset: Asset|undefined;
 
   constructor(private backendService: BackendService, private fb: FormBuilder){
     this.form = this.fb.group({
@@ -46,25 +59,19 @@ export class AssetComponent implements OnInit {
   onSubmit(){
     if (this.form.valid) {
       if (this.formType === "insert") {
-        console.log(this.form);
         this.backendService.createAsset(this.form.value).subscribe({
           next: asset => {
-            console.log(asset);
             if(this.file) {
               const formData = new FormData();
-              ///formData.append("asset_id", asset.id.toString());
               formData.append("blender_file", this.file);
               this.backendService.submitFile(asset.id, formData).subscribe({
                 next: _=>_,
                 error: e => console.log(e)
               });
             }
-
             this.clickCancelForm();
             this.form.reset();
             this.fetchData();
-            
-
           },
           error: e => console.log(e)
         });
@@ -82,11 +89,48 @@ export class AssetComponent implements OnInit {
     }
   }
 
+  addCategory() {
+    if (this.selectedAsset != null && this.assetCategoryId != null){
+      this.backendService.addCategoryToAsset(this.selectedAsset, this.assetCategoryId).subscribe({
+        next: _ => {
+          if(this.selectedAsset != null) {
+            this.updateAssetCategories(this.selectedAsset);
+          }
+        }
+      });
+    }
+  }
+
+  removeCategory(categoryId: number) {
+    if (this.selectedAsset != null) {
+        this.backendService.removeCategoryFromAsset(this.selectedAsset, categoryId).subscribe({
+        next: _ => {
+          if(this.selectedAsset != null) {
+            this.updateAssetCategories(this.selectedAsset);
+          }
+        }
+      });
+    }
+  }
+
+  updateAssetCategories(asset: Asset) {
+    this.backendService.getAssetCategories(asset).subscribe({
+      next: categories => {
+        this.assetCategories = categories;
+        this.availableCategories = this.categories.filter(cat1 => {
+          return !this.assetCategories.some(cat2 => cat1.id === cat2.id);
+        });
+      }
+    });
+  }
+
   fetchData() {
     this.backendService.getAsset().subscribe({next: (asset) => {
-      console.log(asset);
       this.dataSource = new AssetDataSource(asset);
-    }})
+    }});
+    this.backendService.getCategories().subscribe({next: (categories) => {
+      this.categories = categories;
+    }});
   }
 
   clickNew() {
@@ -96,12 +140,12 @@ export class AssetComponent implements OnInit {
   }
 
   clickEdit(asset: Asset) {
-    console.log(asset);
-    //this.form.setValue(asset);
     this.form.patchValue({
       name: asset.name,
       id: asset.id
     });
+    this.updateAssetCategories(asset);
+    this.selectedAsset = asset;
     this.displayTable = "none";
     this.displayForm = "block";
     this.formType = "update";

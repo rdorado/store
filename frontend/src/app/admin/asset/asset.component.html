@@ -68,5 +68,27 @@
             </div>
          </form>
       </div>
+
+      @if (formType === "update") {
+      <div class="form-container">
+         <h4>Categories</h4>
+         <div>
+            @for (category of assetCategories; track category.id) {
+            <div class="asset-categories-container">
+               <div>{{category.name}}</div>
+               <div><button class="button" (click)="removeCategory(category.id)">Remove</button></div>
+            </div>
+            }
+         </div>
+         <div>
+            <select [(ngModel)]="assetCategoryId">
+               @for (category of availableCategories; track category.id) {
+               <option value="{{category.id}}">{{category.name}}</option>
+               }
+            </select>
+            <button class="button" (click)="addCategory()">Add</button>
+         </div>
+      </div>
+      }
    </div>
 </div>

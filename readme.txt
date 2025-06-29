@@ -9,6 +9,10 @@ paintside2.py
 pwd (current directory of this file)
 docker compose up
 
+Install python version compatible with bpy:
+ sudo install python3.11 python3.11-venv
+ then use python3.11 to install the virtual environment
+
  Linux: install vnenv sudo apt install python3-venv
 
 --Install backend deps and reqs:
@@ -16,7 +20,7 @@ docker compose up
    backend\src
 
  -Install dependencies:
-    pip install fastapi[standard] sqlalchemy python-multipart
+    pip install fastapi[standard] sqlalchemy python-multipart bpy
 
 
  -Install python virtual environment:

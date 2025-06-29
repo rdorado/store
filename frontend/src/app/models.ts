@@ -14,5 +14,5 @@ export interface Category {
 export interface Asset {
   id: number;
   name: string;
-  file: string;
+  filename: string;
 }

@@ -1,0 +1,13 @@
+
+.category-menu {
+  padding: 0.3rem 1rem;
+  color: rgb(100, 100, 100);
+  text-decoration: underline;
+  text-underline-offset: 0rem;
+  text-decoration-thickness: 0.1rem;
+  font-weight: 600;
+  &:hover {
+    color: rgb(138, 138, 138);
+    text-underline-offset: 0.8rem;
+  }
+}

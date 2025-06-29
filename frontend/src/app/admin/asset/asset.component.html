@@ -51,15 +51,12 @@
 
             <div class="form-row">
                <label class="data-label" for="file">Filename: </label>
-               <!--input id="type" type="text" formControlName="filename"-->
                <input id="file"
                       type="file"
                       class="file-input"
                       (change)="onFileSelected($event)"
                       formControlName="filename"
                       #fileUpload>
-                
-               <!--button (click)="fileUpload.click()">Send</button-->
             </div>
 
             <div class="buttons-container">

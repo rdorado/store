@@ -17,8 +17,8 @@ export class BackendService {
       .subscribe({next: result => console.log(result)});
   }
 
-  getImage(): Observable<Blob> {
-    return this.httpClient.get(this.API_URL+"/img", { responseType: 'blob' });
+  getImage(id: number): Observable<Blob> {
+    return this.httpClient.get(`${this.API_URL}/img/?id=${id}`, { responseType: 'blob' });
   }
 
   getFileInfo() {
@@ -55,6 +55,10 @@ export class BackendService {
 
   getCategories() {
     return this.httpClient.get<Category[]>(`${this.API_URL}/category`);
+  }
+
+  getCategoriesByType(type: number) {
+    return this.httpClient.get<Category[]>(`${this.API_URL}/category/type/${type}`);
   }
 
   /**

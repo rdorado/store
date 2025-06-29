@@ -1,34 +1,13 @@
 import bpy
 import time
 
-
-def get_meshes_from_asset(file_location):
-    bpy.ops.wm.open_mainfile(filepath=file_location)
-    return bpy.data.meshes.keys()
-
-
-
-
-'''
- *************************************
-'''
-def file_info(filename):
-    print("--> 2")
-    bpy.ops.wm.open_mainfile(filepath="/data/circle-button1.blend")
-    collection = bpy.data.collections['Collection']
-    
-    with open("/data/output.txt", "w") as file_object:
-        file_object.write(str(bpy.data.meshes.keys()))
-        file_object.write(str(dir(bpy.data.meshes)))
-    return "result"
-
-def render():
+def render(blender_file, result_name):
     
     start = time.time()
     def evaltime():
         return str(time.time() - start)
     print("Start: "+evaltime())
-    bpy.ops.wm.open_mainfile(filepath="/data/cube.blend")
+    bpy.ops.wm.open_mainfile(filepath=blender_file)
     
     print("Read file: "+evaltime())
     
@@ -45,8 +24,7 @@ def render():
 
     # render settings
     scene.render.image_settings.file_format = 'PNG'
-    scene.render.filepath = "/data/image.png" #"E:/project/blender/python/Sprite.png"
+    scene.render.filepath = result_name
     print("Before rendering file: "+evaltime())
     print("Finished: "+evaltime())
     bpy.ops.render.render(write_still = 1)
-    return "/data/image.png"

@@ -1,7 +1,7 @@
 from typing import List, Set
 
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import String,Integer, ForeignKey, create_engine
+from sqlalchemy import String,Integer, ForeignKey, create_engine, select
 
 from settings import connection_string, create_data_folder
 
@@ -103,6 +103,15 @@ def get_model(modelclass, model_id=None):
 **********************************
 '''
 
+def get_category_by_type(modelclass, type):
+    Session = sessionmaker(bind=engine)
+    stmt = select(CategoryDAO).where(CategoryDAO.type == type)
+    result = []
+    with Session() as session:
+        for category in session.scalars(stmt):
+            result.append(modelclass.model_validate(category))
+    return result
+
 def get_asset_categories(modelclass, asset_id):
     Session = sessionmaker(bind=engine)
     result = []
@@ -133,47 +142,3 @@ def remove_category_from_asset(asset_id, category_id):
         session.delete(assetCategory)
         session.commit()
     return assetCategory
-
-def insert_blender_asset(name, filename):
-    Session = sessionmaker(bind=engine)
-    with Session() as session:
-        obj = Asset(name=name, filename=filename)
-        session.add(obj)
-        session.commit()
-        session.refresh(obj)
-    return obj
-
-def delete_blender_asset(asset_id: int):
-    Session = sessionmaker(bind=engine)
-    with Session() as session:
-        obj = session.query(Asset).get(asset_id)
-        session.delete(obj)
-        session.commit()
-
-def update_blender_asset(asset_id, name, filename):
-    obj = Asset.query.get(asset_id)
-    if not obj: return
-    Session = sessionmaker(bind=engine)
-    with Session() as session:
-        obj.name = name
-        obj.filename = filename
-        session.commit()
-
-"""
-def get_blender_asset(asset_id=None):
-    Session = sessionmaker(bind=engine)
-    with Session() as session:
-        query = session.query(Asset)
-        if asset_id:
-            result = query.get(asset_id)
-        else:
-            result = query.all()
-    return result
-"""
-    
-def insert_blender_asset_meshes(asset_id, meshes):
-    Session = sessionmaker(bind=engine)
-    with Session() as session:
-        asset = session.query(Asset).get(asset_id)
-        #for mesh in meshes:
-        #    asset.add
